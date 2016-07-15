@@ -31,12 +31,16 @@ app.get('/todos/:id', function(req, res){
 
 //POST
 app.post('/todos',function(req, res){
-	var body = req.body;
-	
+	var body = req.body; //use _.pick to pick only description and completed fields
+	body = _.pick(body,'description', 'completed');
 	//valid each field type
 	if(!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0){
 		return res.status(400).send(); //unable to complete
 	}
+	
+	//set body description to be trimmed value
+	body.description = body.description.trim();
+	
 	body.id = todoNextId;
 	todos.push(body);
 	todoNextId++;	
