@@ -29,6 +29,19 @@ app.get('/todos/:id', function(req, res){
 	}
 });
 
+//DELETE
+app.delete('/todos/:id', function(req, res){
+	var todoId = parseInt(req.params.id);
+	var matchedTodo = _.findWhere(todos,{id: todoId});
+	
+	if(matchedTodo){
+		todos = _.without(todos,matchedTodo);
+		res.status(200).send();
+	}else{
+		res.status(404).send('ID not found');
+	}
+});
+
 //POST
 app.post('/todos',function(req, res){
 	var body = req.body; //use _.pick to pick only description and completed fields
