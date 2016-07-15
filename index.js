@@ -1,26 +1,13 @@
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
 var PORT = process.env.PORT || 3000;
 
-var todos = [
-	{
-		id:1,
-		description:'Go to food basic',
-		complete: false
-	},
-	
-	{
-		id:2,
-		description:'Take out with kids',
-		complete: false
-	},
+var todos = [];
+var todoNextId = 1;
 
-	{
-		id:3,
-		description:'Pay the bills',
-		complete: true
-	}	
-];
+app.use(bodyParser.json());
+
 app.get('/',function(req, res){
 	res.send('Todo-api root');
 });
@@ -48,6 +35,17 @@ app.get('/todos/:id', function(req, res){
 	}else{
 		res.status(404).send('ID not found');
 	}
+});
+
+//POST
+app.post('/todos',function(req, res){
+	var body = req.body;
+	body.id = todoNextId;
+	todos.push(body);
+	todoNextId++;
+	
+	res.json(body);
+	
 });
 
 app.listen(PORT, function(){
