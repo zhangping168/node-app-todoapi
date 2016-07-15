@@ -42,6 +42,40 @@ app.delete('/todos/:id', function(req, res){
 	}
 });
 
+//UPDATE
+app.put('/todos/:id', function(req, res){
+	var todoId = parseInt(req.params.id);
+	var matchedTodo = _.findWhere(todos,{id:todoId});
+	
+	if(!matchedTodo){ return res.status(404).send();}
+	
+	var body = _.pick(req.body, 'description','completed');
+	var validAttributes = {};
+	
+	if(body.hasOwnProperty('completed') && _.isBoolean(body.completed)){
+		
+		validAttributes.completed = body.completed;
+		
+	}else if(body.hasOwnProperty('completed')){
+		return res.status(400).send(); //unable to complete
+	}else{
+		//bad data,not sending anything
+	}
+	
+	if(body.hasOwnProperty('description') && _.isString(body.description)){
+		
+		validAttributes.description = body.description.trim();
+		
+	}else if(body.hasOwnProperty('description')){
+		return res.status(400).send(); //unable to complete
+	}else{
+		//bad data,not sending anything
+	}
+	
+	_.extend(matchedTodo, validAttributes);
+	res.json(matchedTodo);
+});
+
 //POST
 app.post('/todos',function(req, res){
 	var body = req.body; //use _.pick to pick only description and completed fields
