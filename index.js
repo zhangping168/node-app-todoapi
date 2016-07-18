@@ -1,6 +1,8 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
+var db = require('./db.js');
+
 var app = express();
 var PORT = process.env.PORT || 3000;
 
@@ -107,9 +109,16 @@ app.put('/todos/:id', function (req, res) {
 app.post('/todos', function (req, res) {
 	var body = req.body; //use _.pick to pick only description and completed fields
 	body = _.pick(body, 'description', 'completed');
+
+	db.todo.create(body).then(function (todo) {
+		res.json(todo.toJSON());
+	}, function (e) {
+		res.status(400).json(e);
+	});
+	/*
 	//valid each field type
 	if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
-		return res.status(400).send(); //unable to complete
+	return res.status(400).send(); //unable to complete
 	}
 
 	//set body description to be trimmed value
@@ -120,9 +129,13 @@ app.post('/todos', function (req, res) {
 	todoNextId++;
 
 	res.json(body);
+	 */
 
 });
 
-app.listen(PORT, function () {
-	console.log('Todo-api server is on ...');
+db.sequelize.sync().then(function () {
+
+	app.listen(PORT, function () {
+		console.log('Todo-api server is on ...');
+	});
 });
