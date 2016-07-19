@@ -66,11 +66,11 @@ app.delete ('/todos/:id', function (req, res) {
 	db.todo.destroy({
 		where : where
 	}).then(function (rowsDeleted) {
-		
-		if(rowsDeleted === 1){
+
+		if (rowsDeleted === 1) {
 			res.status(204).send('Row has been deleted');
-		}else{
-			res.status(404).send('ID not found');	
+		} else {
+			res.status(404).send('ID not found');
 		}
 	}, function (e) {
 		res.status(500).send();
@@ -81,6 +81,30 @@ app.delete ('/todos/:id', function (req, res) {
 //UPDATE
 app.put('/todos/:id', function (req, res) {
 	var todoId = parseInt(req.params.id);
+	var body = _.pick(req.body, 'description', 'completed');
+	var attributes = {};
+
+	if (body.hasOwnProperty('description')) {
+		attributes.description = body.description.trim();
+	}
+
+	if (body.hasOwnProperty('completed')) {
+		attributes.completed = body.completed;
+	}
+
+	db.todo.findById(todoId).then(function (todo) {
+		if (todo) {
+			todo.update(attributes).then(function (todo) {
+				res.json(todo.toJSON());
+			}, function (e) {
+				res.status(400).send();
+			});
+		} else {
+			res.status(404).send();
+		}
+	}, function (e) {
+		res.status(500).send();
+	});
 
 });
 
